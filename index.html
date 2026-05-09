@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>SPMB | Universitas Pamulang</title>
-    <!-- Google Fonts Poppins & Ikon -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -18,86 +16,111 @@
     </div>
 
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <div class="campus-name">UNIVERSITAS PAMULANG</div>
             <h1><i class="fas fa-graduation-cap"></i> Sistem Pendaftaran Mahasiswa Baru</h1>
-            <p class="tagline">Kampus Unggul & Modern</p>
+            <div class="step-badge">STEP 1: PROFILE & ACADEMIC DATA</div>
         </div>
 
-        <!-- Form Card -->
-        <div class="card">
-            <h3><i class="fas fa-file-alt"></i> Formulir Pendaftaran</h3>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>Kode Pendaftaran <span style="color:red;">*</span> (contoh: A2-101-9)</label>
-                    <input type="text" id="kodePendaftaran" placeholder="Contoh: A2-101-9">
+        <!-- Dua Kolom: Form Kiri + Preview Kanan -->
+        <div class="dashboard-grid">
+            <!-- Kiri: Form Pendaftaran -->
+            <div class="card form-card">
+                <h3><i class="fas fa-file-alt"></i> Formulir Pendaftaran</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Kode Pendaftaran <span class="required">*</span> (contoh: A2-101-9)</label>
+                        <input type="text" id="kodePendaftaran" placeholder="Contoh: A2-101-9">
+                    </div>
+                    <div class="input-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="nama" placeholder="Nama Peserta">
+                    </div>
+                    <div class="input-group">
+                        <label>Gedung Tes</label>
+                        <select id="gedung">
+                            <option value="">Pilih Gedung</option>
+                            <option value="A">A - Gedung A</option>
+                            <option value="B">B - Gedung B</option>
+                            <option value="V">V - Gedung Viktor</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Bulan Tes</label>
+                        <select id="bulan">
+                            <option value="">Pilih Bulan</option>
+                            <option value="1">Januari (1)</option><option value="2">Februari (2)</option>
+                            <option value="3">Maret (3)</option><option value="4">April (4)</option>
+                            <option value="5">Mei (5)</option><option value="6">Juni (6)</option>
+                            <option value="7">Juli (7)</option><option value="8">Agustus (8)</option>
+                            <option value="9">September (9)</option>
+                            <option value="O">Oktober (O)</option><option value="N">November (N)</option>
+                            <option value="D">Desember (D)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Jenis Kelamin</label>
+                        <select id="jk">
+                            <option value="">Pilih</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Asal Sekolah</label>
+                        <input type="text" id="asalSekolah" placeholder="Nama SMA/SMK/MA">
+                    </div>
+                    <div class="input-group">
+                        <label>Pekerjaan Orang Tua</label>
+                        <input type="text" id="pekerjaanOrtu" placeholder="Contoh: Petani, PNS, Wiraswasta">
+                    </div>
+                    <div class="input-group">
+                        <label>Nilai Matematika (0-100)</label>
+                        <input type="number" id="mat" min="0" max="100" step="1" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Nilai Bahasa Indonesia</label>
+                        <input type="number" id="bindo" min="0" max="100" step="1" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Nilai Bahasa Inggris</label>
+                        <input type="number" id="binggris" min="0" max="100" step="1" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Rata-rata Nilai</label>
+                        <input type="text" id="rata" readonly placeholder="Otomatis">
+                    </div>
+                    <div class="input-group">
+                        <label>Hasil Keterangan</label>
+                        <input type="text" id="keterangan" readonly placeholder="Otomatis">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="nama" placeholder="Nama Peserta">
-                </div>
-                <div class="input-group">
-                    <label>Gedung Tes</label>
-                    <select id="gedung">
-                        <option value="">Pilih Gedung</option>
-                        <option value="A">A - Gedung A</option>
-                        <option value="B">B - Gedung B</option>
-                        <option value="V">V - Gedung Viktor</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Bulan Tes</label>
-                    <select id="bulan">
-                        <option value="">Pilih Bulan</option>
-                        <option value="1">Januari (1)</option><option value="2">Februari (2)</option>
-                        <option value="3">Maret (3)</option><option value="4">April (4)</option>
-                        <option value="5">Mei (5)</option><option value="6">Juni (6)</option>
-                        <option value="7">Juli (7)</option><option value="8">Agustus (8)</option>
-                        <option value="9">September (9)</option>
-                        <option value="O">Oktober (O)</option><option value="N">November (N)</option>
-                        <option value="D">Desember (D)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Jenis Kelamin</label>
-                    <select id="jk">
-                        <option value="">Pilih</option>
-                        <option value="Laki-laki">Laki-laki</option>
-                        <option value="Perempuan">Perempuan</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Asal Sekolah</label>
-                    <input type="text" id="asalSekolah" placeholder="Nama SMA/SMK/MA">
-                </div>
-                <div class="input-group">
-                    <label>Pekerjaan Orang Tua</label>
-                    <input type="text" id="pekerjaanOrtu" placeholder="Contoh: Petani, PNS, Wiraswasta">
-                </div>
-                <div class="input-group">
-                    <label>Nilai Matematika (0-100)</label>
-                    <input type="number" id="mat" min="0" max="100" step="1" value="0">
-                </div>
-                <div class="input-group">
-                    <label>Nilai Bahasa Indonesia</label>
-                    <input type="number" id="bindo" min="0" max="100" step="1" value="0">
-                </div>
-                <div class="input-group">
-                    <label>Nilai Bahasa Inggris</label>
-                    <input type="number" id="binggris" min="0" max="100" step="1" value="0">
-                </div>
-                <div class="input-group">
-                    <label>Rata-rata Nilai</label>
-                    <input type="text" id="rata" readonly placeholder="Otomatis">
-                </div>
-                <div class="input-group">
-                    <label>Hasil Keterangan</label>
-                    <input type="text" id="keterangan" readonly placeholder="Otomatis">
+                <div class="btn-group">
+                    <button id="btnSimpan"><i class="fas fa-save"></i> Kirim Formulir</button>
+                    <button id="btnReset" class="btn-reset"><i class="fas fa-undo-alt"></i> Reset</button>
                 </div>
             </div>
-            <div class="btn-group">
-                <button id="btnSimpan"><i class="fas fa-save"></i> Simpan</button>
-                <button id="btnReset" class="btn-reset"><i class="fas fa-undo-alt"></i> Reset</button>
+
+            <!-- Kanan: Preview Profil Dinamis (tanpa upload dokumen) -->
+            <div class="card preview-card">
+                <h3><i class="fas fa-id-card"></i> Preview Data Pendaftar</h3>
+                <div class="profile-preview">
+                    <div class="avatar" id="avatarPreview">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="preview-details">
+                        <div class="preview-row"><span class="label">Nama:</span> <span id="previewNama">-</span></div>
+                        <div class="preview-row"><span class="label">Kode Pendaftaran:</span> <span id="previewKode">-</span></div>
+                        <div class="preview-row"><span class="label">Gedung & Bulan:</span> <span id="previewGedungBulan">-</span></div>
+                        <div class="preview-row"><span class="label">Jenis Kelamin:</span> <span id="previewJK">-</span></div>
+                        <div class="preview-row"><span class="label">Asal Sekolah:</span> <span id="previewAsal">-</span></div>
+                        <div class="preview-row"><span class="label">Pekerjaan Orang Tua:</span> <span id="previewPekerjaan">-</span></div>
+                        <div class="preview-row"><span class="label">Nilai (M/B.I/B.Ing):</span> <span id="previewNilai">-</span></div>
+                        <div class="preview-row"><span class="label">Rata-rata:</span> <span id="previewRata">-</span></div>
+                        <div class="preview-row"><span class="label">Status:</span> <span id="previewStatus" class="status-badge">-</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -109,8 +132,8 @@
             <div class="stat-card"><h4><i class="fas fa-users"></i> Total Peserta</h4><div class="number" id="statTotal">0</div></div>
         </div>
 
-        <!-- Tabel Data -->
-        <div class="card">
+        <!-- Tabel Data Pendaftar -->
+        <div class="card table-card">
             <div class="toolbar">
                 <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Cari Kode, Nama, Sekolah..."></div>
                 <select id="filterKelulusan" class="filter-select">
@@ -129,7 +152,7 @@
                 </table>
             </div>
         </div>
-        <footer>© 2025 Universitas Pamulang - Sistem Informasi Pendaftaran Modern</footer>
+        <footer>© 2025 Muhammad Reza - Sistem Informasi Pendaftaran Modern</footer>
     </div>
     <script src="script.js"></script>
 </body>

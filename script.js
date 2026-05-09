@@ -2,18 +2,23 @@
 let participants = [];
 let editId = null;
 
-// Load / Save localStorage
 function loadFromStorage() {
     const stored = localStorage.getItem("univ_pendaftaran");
     if (stored) {
-        participants = JSON.parse(stored);
+        try {
+            let data = JSON.parse(stored);
+            if (Array.isArray(data) && data.length > 0 && data[0].hasOwnProperty('kodePendaftaran')) {
+                participants = data;
+            } else {
+                participants = [];
+                syncStorage();
+            }
+        } catch(e) {
+            participants = [];
+            syncStorage();
+        }
     } else {
-        // Data awal (demo) dengan struktur baru
-        participants = [
-            { id: 1, kodePendaftaran: "A2-101-9", nama: "Ahmad Fauzi", gedung: "A", bulan: "2", jenisKelamin: "Laki-laki", asalSekolah: "SMA 1 Pamulang", pekerjaanOrtu: "PNS", nilaiMat: 85, nilaiBindo: 78, nilaiInggris: 80, rataRata: 81, keterangan: "Lulus" },
-            { id: 2, kodePendaftaran: "B7-202-1", nama: "Siti Nurhaliza", gedung: "B", bulan: "7", jenisKelamin: "Perempuan", asalSekolah: "SMAN 2 Tangerang", pekerjaanOrtu: "Wiraswasta", nilaiMat: 65, nilaiBindo: 70, nilaiInggris: 68, rataRata: 67.67, keterangan: "Cadangan" },
-            { id: 3, kodePendaftaran: "V1-303-2", nama: "Budi Santoso", gedung: "V", bulan: "1", jenisKelamin: "Laki-laki", asalSekolah: "SMA Cendekia", pekerjaanOrtu: "Petani", nilaiMat: 45, nilaiBindo: 50, nilaiInggris: 48, rataRata: 47.67, keterangan: "Tidak Lulus" }
-        ];
+        participants = [];
         syncStorage();
     }
     renderStatistik();
@@ -24,7 +29,6 @@ function syncStorage() {
     localStorage.setItem("univ_pendaftaran", JSON.stringify(participants));
 }
 
-// ========== HITUNG RATA & KETERANGAN ==========
 function hitungRataDanKeterangan() {
     let mat = parseFloat(document.getElementById('mat').value) || 0;
     let bindo = parseFloat(document.getElementById('bindo').value) || 0;
@@ -42,14 +46,16 @@ function hitungRataDanKeterangan() {
     return { rata: parseFloat(rata), keterangan };
 }
 
-// Event listener untuk input nilai
 function attachNilaiEvents() {
-    ['mat', 'bindo', 'binggris'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => hitungRataDanKeterangan());
+    ['mat', 'bindo', 'binggris', 'nama', 'kodePendaftaran', 'gedung', 'bulan', 'jk', 'asalSekolah', 'pekerjaanOrtu'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => {
+            hitungRataDanKeterangan();
+            updatePreview();
+        });
     });
 }
 
-// ========== KONVERSI GEDUNG & BULAN ==========
 function getGedungDanBulan(gedungCode, bulanCode) {
     const gedungMap = { 'A': 'Gedung A', 'B': 'Gedung B', 'V': 'Gedung Viktor' };
     const gedung = gedungMap[gedungCode] || '?';
@@ -61,7 +67,50 @@ function getGedungDanBulan(gedungCode, bulanCode) {
     return `${gedung} (${bulan})`;
 }
 
-// ========== FORM RESET ==========
+function updatePreview() {
+    const nama = document.getElementById('nama').value.trim() || "-";
+    const kode = document.getElementById('kodePendaftaran').value.trim() || "-";
+    const gedung = document.getElementById('gedung').value;
+    const bulan = document.getElementById('bulan').value;
+    const jk = document.getElementById('jk').value;
+    const asal = document.getElementById('asalSekolah').value.trim() || "-";
+    const pekerjaan = document.getElementById('pekerjaanOrtu').value.trim() || "-";
+    const mat = document.getElementById('mat').value || 0;
+    const bindo = document.getElementById('bindo').value || 0;
+    const bing = document.getElementById('binggris').value || 0;
+    const rata = document.getElementById('rata').value || "0";
+    const keterangan = document.getElementById('keterangan').value || "-";
+
+    const gedungMap = { 'A': 'Gedung A', 'B': 'Gedung B', 'V': 'Gedung Viktor' };
+    const bulanMap = { '1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'Mei','6':'Jun','7':'Jul','8':'Ags','9':'Sep','O':'Okt','N':'Nov','D':'Des' };
+    const gedungTeks = gedungMap[gedung] || '-';
+    const bulanTeks = bulanMap[bulan] || '-';
+    const lokasi = `${gedungTeks} (${bulanTeks})`;
+
+    document.getElementById('previewNama').innerText = nama;
+    document.getElementById('previewKode').innerText = kode;
+    document.getElementById('previewGedungBulan').innerText = lokasi;
+    document.getElementById('previewJK').innerText = jk || "-";
+    document.getElementById('previewAsal').innerText = asal;
+    document.getElementById('previewPekerjaan').innerText = pekerjaan;
+    document.getElementById('previewNilai').innerText = `${mat} / ${bindo} / ${bing}`;
+    document.getElementById('previewRata').innerText = rata;
+    const statusSpan = document.getElementById('previewStatus');
+    statusSpan.innerText = keterangan;
+    if (keterangan === "Lulus") statusSpan.style.background = "#10b981";
+    else if (keterangan === "Cadangan") statusSpan.style.background = "#f59e0b";
+    else statusSpan.style.background = "#ef4444";
+
+    const avatarIcon = document.querySelector('#avatarPreview i');
+    if (jk === "Laki-laki") {
+        avatarIcon.className = "fas fa-user-graduate";
+    } else if (jk === "Perempuan") {
+        avatarIcon.className = "fas fa-user-tie";
+    } else {
+        avatarIcon.className = "fas fa-user-circle";
+    }
+}
+
 function resetForm() {
     document.getElementById('kodePendaftaran').value = '';
     document.getElementById('nama').value = '';
@@ -74,10 +123,10 @@ function resetForm() {
     document.getElementById('bindo').value = '0';
     document.getElementById('binggris').value = '0';
     hitungRataDanKeterangan();
+    updatePreview();
     editId = null;
 }
 
-// ========== SIMPAN / EDIT ==========
 function simpanData() {
     const kodePendaftaran = document.getElementById('kodePendaftaran').value.trim();
     const nama = document.getElementById('nama').value.trim();
@@ -91,7 +140,7 @@ function simpanData() {
     let bing = parseFloat(document.getElementById('binggris').value);
 
     if (!kodePendaftaran || !nama || !gedung || !bulan || !jk || !asal || !pekerjaanOrtu) {
-        Swal.fire("Error", "Semua field harus diisi (Kode Pendaftaran, Nama, Gedung, Bulan, JK, Asal Sekolah, Pekerjaan Orang Tua)!", "error");
+        Swal.fire("Error", "Semua field harus diisi!", "error");
         return false;
     }
     if (isNaN(mat) || isNaN(bindo) || isNaN(bing)) {
@@ -102,10 +151,9 @@ function simpanData() {
     bindo = Math.min(100, Math.max(0, bindo));
     bing = Math.min(100, Math.max(0, bing));
 
-    // Cek unik kode pendaftaran (kecuali sedang edit data yang sama)
     const existing = participants.find(p => p.kodePendaftaran === kodePendaftaran && (editId === null || p.id !== editId));
     if (existing) {
-        Swal.fire("Error", "Kode Pendaftaran sudah digunakan! Masukkan kode yang berbeda.", "error");
+        Swal.fire("Error", "Kode Pendaftaran sudah digunakan!", "error");
         return false;
     }
 
@@ -119,25 +167,15 @@ function simpanData() {
     if (editId !== null) {
         const index = participants.findIndex(p => p.id === editId);
         if (index !== -1) {
-            participants[index] = {
-                ...participants[index],
-                kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu,
-                nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing,
-                rataRata: rataRounded, keterangan: keteranganFix
-            };
-            Swal.fire("Berhasil!", "Data peserta diperbarui", "success");
+            participants[index] = { ...participants[index], kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix };
+            Swal.fire("Berhasil!", "Data diperbarui", "success");
         } else {
             Swal.fire("Gagal", "Data tidak ditemukan", "error");
             return false;
         }
     } else {
         const newId = Date.now();
-        const newPeserta = {
-            id: newId, kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu,
-            nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing,
-            rataRata: rataRounded, keterangan: keteranganFix
-        };
-        participants.push(newPeserta);
+        participants.push({ id: newId, kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix });
         Swal.fire("Tersimpan!", "Pendaftaran berhasil ditambahkan", "success");
     }
     syncStorage();
@@ -151,7 +189,7 @@ function simpanData() {
 function hapusData(id) {
     Swal.fire({
         title: "Konfirmasi Hapus",
-        text: "Apakah Anda yakin ingin menghapus pendaftar ini?",
+        text: "Yakin ingin menghapus?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
@@ -183,24 +221,18 @@ function editData(id) {
     document.getElementById('bindo').value = peserta.nilaiBindo;
     document.getElementById('binggris').value = peserta.nilaiInggris;
     hitungRataDanKeterangan();
+    updatePreview();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ========== FILTER & SEARCH ==========
 function getFilteredData() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const filterKel = document.getElementById('filterKelulusan').value;
     let filtered = [...participants];
     if (searchTerm) {
-        filtered = filtered.filter(p =>
-            p.kodePendaftaran.toLowerCase().includes(searchTerm) ||
-            p.nama.toLowerCase().includes(searchTerm) ||
-            p.asalSekolah.toLowerCase().includes(searchTerm)
-        );
+        filtered = filtered.filter(p => p.kodePendaftaran.toLowerCase().includes(searchTerm) || p.nama.toLowerCase().includes(searchTerm) || p.asalSekolah.toLowerCase().includes(searchTerm));
     }
-    if (filterKel !== "ALL") {
-        filtered = filtered.filter(p => p.keterangan === filterKel);
-    }
+    if (filterKel !== "ALL") filtered = filtered.filter(p => p.keterangan === filterKel);
     return filtered;
 }
 
@@ -232,7 +264,6 @@ function renderTable() {
         actionCell.className = "action-icons";
         actionCell.innerHTML = `<i class="fas fa-edit" data-id="${p.id}"></i> <i class="fas fa-trash-alt" data-id="${p.id}"></i>`;
     });
-    // Event listener untuk tombol edit/hapus
     document.querySelectorAll('.fa-edit').forEach(icon => {
         icon.addEventListener('click', (e) => { const id = parseInt(icon.getAttribute('data-id')); editData(id); });
     });
@@ -251,7 +282,6 @@ function renderStatistik() {
     document.getElementById('statTotal').innerText = participants.length;
 }
 
-// ========== DARK MODE ==========
 function initDarkMode() {
     const darkToggle = document.getElementById('darkModeToggle');
     const isDark = localStorage.getItem('darkMode') === 'true';
@@ -262,7 +292,6 @@ function initDarkMode() {
     });
 }
 
-// ========== EVENT LISTENERS & INIT ==========
 function setupEventListeners() {
     document.getElementById('btnSimpan').addEventListener('click', () => simpanData());
     document.getElementById('btnReset').addEventListener('click', () => { resetForm(); editId = null; Swal.fire("Reset", "Form telah dikosongkan", "info"); });
@@ -276,4 +305,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     initDarkMode();
     hitungRataDanKeterangan();
+    updatePreview();
 });
