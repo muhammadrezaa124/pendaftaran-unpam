@@ -169,7 +169,6 @@ button:hover {
 }
 .btn-reset { background: #475569; }
 .btn-reset:hover { background: #334155; }
-.btn-print { background: #2c3e66; }
 
 /* Statistik */
 .stat-grid {
@@ -289,13 +288,4 @@ footer {
     .filter-select { width: 100%; }
     th, td { font-size: 0.65rem; padding: 6px 4px; }
     .dark-toggle { top: 10px; right: 10px; padding: 6px 12px; }
-}
-
-/* Print style */
-@media print {
-    body * { visibility: hidden; }
-    .container, .container * { visibility: visible; }
-    .card, table, .stat-grid, .toolbar, .header { visibility: visible; }
-    .dark-toggle, .btn-print, .btn-group, .action-icons i { display: none !important; }
-    body, .card { background: white; color: black; }
 }

@@ -272,7 +272,6 @@ function initDarkMode() {
 function setupEventListeners() {
     document.getElementById('btnSimpan').addEventListener('click', () => simpanData());
     document.getElementById('btnReset').addEventListener('click', () => { resetForm(); editId = null; Swal.fire("Reset", "Form telah dikosongkan", "info"); });
-    document.getElementById('btnPrint').addEventListener('click', () => window.print());
     document.getElementById('searchInput').addEventListener('input', () => renderTable());
     document.getElementById('filterKelulusan').addEventListener('change', () => renderTable());
 }
