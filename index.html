@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>SPMB | Universitas Pamulang</title>
+    <!-- Google Fonts Poppins & Ikon -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dark-toggle" id="darkModeToggle">
+        <i class="fas fa-sun"></i>
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="campus-name">UNIVERSITAS PAMULANG</div>
+            <h1><i class="fas fa-graduation-cap"></i> Sistem Pendaftaran Mahasiswa Baru</h1>
+            <p class="tagline">Kampus Unggul & Modern</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="card">
+            <h3><i class="fas fa-file-alt"></i> Formulir Pendaftaran</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>NIM Pendaftaran</label><input type="text" id="nim" placeholder="Contoh: 20241001"></div>
+                <div class="input-group"><label>Nama Lengkap</label><input type="text" id="nama" placeholder="Nama Peserta"></div>
+                <div class="input-group"><label>Kode Pendaftaran (2 Karakter)</label><input type="text" id="kode" placeholder="A2, B5, VO, ND" maxlength="2"></div>
+                <div class="input-group"><label>Jenis Kelamin</label><select id="jk"><option value="">Pilih</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+                <div class="input-group"><label>Asal Sekolah</label><input type="text" id="asalSekolah" placeholder="Nama SMA/SMK/MA"></div>
+                <div class="input-group"><label>Nilai Matematika (0-100)</label><input type="number" id="mat" min="0" max="100" step="1" value="0"></div>
+                <div class="input-group"><label>Nilai Bahasa Indonesia</label><input type="number" id="bindo" min="0" max="100" step="1" value="0"></div>
+                <div class="input-group"><label>Nilai Bahasa Inggris</label><input type="number" id="binggris" min="0" max="100" step="1" value="0"></div>
+                <div class="input-group"><label>Rata-rata Nilai</label><input type="text" id="rata" readonly placeholder="Otomatis"></div>
+                <div class="input-group"><label>Hasil Keterangan</label><input type="text" id="keterangan" readonly placeholder="Otomatis"></div>
+            </div>
+            <div class="btn-group">
+                <button id="btnSimpan"><i class="fas fa-save"></i> Simpan</button>
+                <button id="btnReset" class="btn-reset"><i class="fas fa-undo-alt"></i> Reset</button>
+                <button id="btnPrint" class="btn-print"><i class="fas fa-print"></i> Export PDF / Print</button>
+            </div>
+        </div>
+
+        <!-- Statistik -->
+        <div class="stat-grid">
+            <div class="stat-card"><h4><i class="fas fa-check-circle"></i> Lulus</h4><div class="number" id="statLulus">0</div></div>
+            <div class="stat-card"><h4><i class="fas fa-clock"></i> Cadangan</h4><div class="number" id="statCadangan">0</div></div>
+            <div class="stat-card"><h4><i class="fas fa-times-circle"></i> Tidak Lulus</h4><div class="number" id="statTidak">0</div></div>
+            <div class="stat-card"><h4><i class="fas fa-users"></i> Total Peserta</h4><div class="number" id="statTotal">0</div></div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div class="card">
+            <div class="toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Cari NIM, Nama, Sekolah..."></div>
+                <select id="filterKelulusan" class="filter-select">
+                    <option value="ALL">Semua Keterangan</option>
+                    <option value="Lulus">Lulus</option>
+                    <option value="Cadangan">Cadangan</option>
+                    <option value="Tidak Lulus">Tidak Lulus</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr><th>No</th><th>NIM</th><th>Nama</th><th>Kode</th><th>Gedung & Bulan</th><th>JK</th><th>Asal Sekolah</th><th>Mat</th><th>B.Indo</th><th>B.Ing</th><th>Rata2</th><th>Keterangan</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <footer>© 2025 Universitas Pamulang - Sistem Informasi Pendaftaran Modern</footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
