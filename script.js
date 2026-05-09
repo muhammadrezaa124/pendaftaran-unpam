@@ -47,7 +47,9 @@ function hitungRataDanKeterangan() {
 }
 
 function attachNilaiEvents() {
-    ['mat', 'bindo', 'binggris', 'nama', 'kodePendaftaran', 'gedung', 'bulan', 'jk', 'asalSekolah', 'pekerjaanOrtu'].forEach(id => {
+    const fields = ['mat', 'bindo', 'binggris', 'nama', 'kodePendaftaran', 'tempatLahir', 'tglLahir',
+                    'gedung', 'bulan', 'jk', 'asalSekolah', 'pekerjaanOrtu'];
+    fields.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', () => {
             hitungRataDanKeterangan();
@@ -67,8 +69,18 @@ function getGedungDanBulan(gedungCode, bulanCode) {
     return `${gedung} (${bulan})`;
 }
 
+function formatTanggal(tgl) {
+    if (!tgl) return '-';
+    const date = new Date(tgl);
+    return date.toLocaleDateString('id-ID');
+}
+
 function updatePreview() {
     const nama = document.getElementById('nama').value.trim() || "-";
+    const tempat = document.getElementById('tempatLahir').value.trim() || "-";
+    const tgl = document.getElementById('tglLahir').value;
+    const tglFormatted = tgl ? formatTanggal(tgl) : "-";
+    const ttl = `${tempat}, ${tglFormatted}`;
     const kode = document.getElementById('kodePendaftaran').value.trim() || "-";
     const gedung = document.getElementById('gedung').value;
     const bulan = document.getElementById('bulan').value;
@@ -88,6 +100,7 @@ function updatePreview() {
     const lokasi = `${gedungTeks} (${bulanTeks})`;
 
     document.getElementById('previewNama').innerText = nama;
+    document.getElementById('previewTtl').innerText = ttl;
     document.getElementById('previewKode').innerText = kode;
     document.getElementById('previewGedungBulan').innerText = lokasi;
     document.getElementById('previewJK').innerText = jk || "-";
@@ -114,6 +127,8 @@ function updatePreview() {
 function resetForm() {
     document.getElementById('kodePendaftaran').value = '';
     document.getElementById('nama').value = '';
+    document.getElementById('tempatLahir').value = '';
+    document.getElementById('tglLahir').value = '';
     document.getElementById('gedung').value = '';
     document.getElementById('bulan').value = '';
     document.getElementById('jk').value = '';
@@ -130,6 +145,8 @@ function resetForm() {
 function simpanData() {
     const kodePendaftaran = document.getElementById('kodePendaftaran').value.trim();
     const nama = document.getElementById('nama').value.trim();
+    const tempatLahir = document.getElementById('tempatLahir').value.trim();
+    const tglLahir = document.getElementById('tglLahir').value;
     const gedung = document.getElementById('gedung').value;
     const bulan = document.getElementById('bulan').value;
     const jk = document.getElementById('jk').value;
@@ -139,7 +156,7 @@ function simpanData() {
     let bindo = parseFloat(document.getElementById('bindo').value);
     let bing = parseFloat(document.getElementById('binggris').value);
 
-    if (!kodePendaftaran || !nama || !gedung || !bulan || !jk || !asal || !pekerjaanOrtu) {
+    if (!kodePendaftaran || !nama || !tempatLahir || !tglLahir || !gedung || !bulan || !jk || !asal || !pekerjaanOrtu) {
         Swal.fire("Error", "Semua field harus diisi!", "error");
         return false;
     }
@@ -167,7 +184,7 @@ function simpanData() {
     if (editId !== null) {
         const index = participants.findIndex(p => p.id === editId);
         if (index !== -1) {
-            participants[index] = { ...participants[index], kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix };
+            participants[index] = { ...participants[index], kodePendaftaran, nama, tempatLahir, tglLahir, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix };
             Swal.fire("Berhasil!", "Data diperbarui", "success");
         } else {
             Swal.fire("Gagal", "Data tidak ditemukan", "error");
@@ -175,7 +192,7 @@ function simpanData() {
         }
     } else {
         const newId = Date.now();
-        participants.push({ id: newId, kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix });
+        participants.push({ id: newId, kodePendaftaran, nama, tempatLahir, tglLahir, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu, nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing, rataRata: rataRounded, keterangan: keteranganFix });
         Swal.fire("Tersimpan!", "Pendaftaran berhasil ditambahkan", "success");
     }
     syncStorage();
@@ -212,6 +229,8 @@ function editData(id) {
     editId = id;
     document.getElementById('kodePendaftaran').value = peserta.kodePendaftaran;
     document.getElementById('nama').value = peserta.nama;
+    document.getElementById('tempatLahir').value = peserta.tempatLahir || '';
+    document.getElementById('tglLahir').value = peserta.tglLahir || '';
     document.getElementById('gedung').value = peserta.gedung;
     document.getElementById('bulan').value = peserta.bulan;
     document.getElementById('jk').value = peserta.jenisKelamin;
@@ -241,7 +260,7 @@ function renderTable() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = "";
     if (filtered.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='13' style='text-align:center'>Tidak ada data pendaftar</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='15' style='text-align:center'>Tidak ada data pendaftar</td></tr>";
         return;
     }
     filtered.forEach((p, idx) => {
@@ -250,17 +269,19 @@ function renderTable() {
         row.insertCell(0).innerText = idx + 1;
         row.insertCell(1).innerText = p.kodePendaftaran;
         row.insertCell(2).innerText = p.nama;
-        row.insertCell(3).innerText = lokasi;
-        row.insertCell(4).innerText = p.jenisKelamin;
-        row.insertCell(5).innerText = p.asalSekolah;
-        row.insertCell(6).innerText = p.pekerjaanOrtu;
-        row.insertCell(7).innerText = p.nilaiMat;
-        row.insertCell(8).innerText = p.nilaiBindo;
-        row.insertCell(9).innerText = p.nilaiInggris;
-        row.insertCell(10).innerText = p.rataRata;
+        row.insertCell(3).innerText = p.tempatLahir || '-';
+        row.insertCell(4).innerText = p.tglLahir ? formatTanggal(p.tglLahir) : '-';
+        row.insertCell(5).innerText = lokasi;
+        row.insertCell(6).innerText = p.jenisKelamin;
+        row.insertCell(7).innerText = p.asalSekolah;
+        row.insertCell(8).innerText = p.pekerjaanOrtu;
+        row.insertCell(9).innerText = p.nilaiMat;
+        row.insertCell(10).innerText = p.nilaiBindo;
+        row.insertCell(11).innerText = p.nilaiInggris;
+        row.insertCell(12).innerText = p.rataRata;
         let badge = p.keterangan === "Lulus" ? "✅ Lulus" : (p.keterangan === "Cadangan" ? "⚠️ Cadangan" : "❌ Tidak Lulus");
-        row.insertCell(11).innerHTML = `<span style="font-weight:500;">${badge}</span>`;
-        const actionCell = row.insertCell(12);
+        row.insertCell(13).innerHTML = `<span style="font-weight:500;">${badge}</span>`;
+        const actionCell = row.insertCell(14);
         actionCell.className = "action-icons";
         actionCell.innerHTML = `<i class="fas fa-edit" data-id="${p.id}"></i> <i class="fas fa-trash-alt" data-id="${p.id}"></i>`;
     });

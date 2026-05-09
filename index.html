@@ -16,16 +16,14 @@
     </div>
 
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="campus-name">UNIVERSITAS PAMULANG</div>
             <h1><i class="fas fa-graduation-cap"></i> Sistem Pendaftaran Mahasiswa Baru</h1>
             <div class="step-badge">STEP 1: PROFILE & ACADEMIC DATA</div>
         </div>
 
-        <!-- Dua Kolom: Form Kiri + Preview Kanan -->
         <div class="dashboard-grid">
-            <!-- Kiri: Form Pendaftaran -->
+            <!-- Form -->
             <div class="card form-card">
                 <h3><i class="fas fa-file-alt"></i> Formulir Pendaftaran</h3>
                 <div class="form-grid">
@@ -36,6 +34,14 @@
                     <div class="input-group">
                         <label>Nama Lengkap</label>
                         <input type="text" id="nama" placeholder="Nama Peserta">
+                    </div>
+                    <div class="input-group">
+                        <label>Tempat Lahir</label>
+                        <input type="text" id="tempatLahir" placeholder="Contoh: Jakarta">
+                    </div>
+                    <div class="input-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" id="tglLahir">
                     </div>
                     <div class="input-group">
                         <label>Gedung Tes</label>
@@ -102,7 +108,7 @@
                 </div>
             </div>
 
-            <!-- Kanan: Preview Profil Dinamis (tanpa upload dokumen) -->
+            <!-- Preview -->
             <div class="card preview-card">
                 <h3><i class="fas fa-id-card"></i> Preview Data Pendaftar</h3>
                 <div class="profile-preview">
@@ -111,6 +117,7 @@
                     </div>
                     <div class="preview-details">
                         <div class="preview-row"><span class="label">Nama:</span> <span id="previewNama">-</span></div>
+                        <div class="preview-row"><span class="label">Tempat, Tgl Lahir:</span> <span id="previewTtl">-</span></div>
                         <div class="preview-row"><span class="label">Kode Pendaftaran:</span> <span id="previewKode">-</span></div>
                         <div class="preview-row"><span class="label">Gedung & Bulan:</span> <span id="previewGedungBulan">-</span></div>
                         <div class="preview-row"><span class="label">Jenis Kelamin:</span> <span id="previewJK">-</span></div>
@@ -132,7 +139,7 @@
             <div class="stat-card"><h4><i class="fas fa-users"></i> Total Peserta</h4><div class="number" id="statTotal">0</div></div>
         </div>
 
-        <!-- Tabel Data Pendaftar -->
+        <!-- Tabel -->
         <div class="card table-card">
             <div class="toolbar">
                 <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Cari Kode, Nama, Sekolah..."></div>
@@ -146,7 +153,11 @@
             <div class="table-wrapper">
                 <table id="dataTable">
                     <thead>
-                        <tr><th>No</th><th>Kode Pendaftaran</th><th>Nama</th><th>Gedung & Bulan</th><th>JK</th><th>Asal Sekolah</th><th>Pekerjaan Orang Tua</th><th>Mat</th><th>B.Indo</th><th>B.Ing</th><th>Rata2</th><th>Keterangan</th><th>Aksi</th></tr>
+                        <tr>
+                            <th>No</th><th>Kode Pendaftaran</th><th>Nama</th><th>Tempat Lahir</th><th>Tgl Lahir</th>
+                            <th>Gedung & Bulan</th><th>JK</th><th>Asal Sekolah</th><th>Pekerjaan Orang Tua</th>
+                            <th>Mat</th><th>B.Indo</th><th>B.Ing</th><th>Rata2</th><th>Keterangan</th><th>Aksi</th>
+                        </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
