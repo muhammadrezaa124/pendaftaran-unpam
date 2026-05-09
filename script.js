@@ -8,11 +8,11 @@ function loadFromStorage() {
     if (stored) {
         participants = JSON.parse(stored);
     } else {
-        // Data awal (demo)
+        // Data awal (demo) dengan struktur baru
         participants = [
-            { id: 1, nim: "202411001", nama: "Ahmad Fauzi", kode: "A3", jenisKelamin: "Laki-laki", asalSekolah: "SMA 1 Pamulang", nilaiMat: 85, nilaiBindo: 78, nilaiInggris: 80, rataRata: 81, keterangan: "Lulus" },
-            { id: 2, nim: "202411002", nama: "Siti Nurhaliza", kode: "B7", jenisKelamin: "Perempuan", asalSekolah: "SMAN 2 Tangerang", nilaiMat: 65, nilaiBindo: 70, nilaiInggris: 68, rataRata: 67.67, keterangan: "Cadangan" },
-            { id: 3, nim: "202411003", nama: "Budi Santoso", kode: "V1", jenisKelamin: "Laki-laki", asalSekolah: "SMA Cendekia", nilaiMat: 45, nilaiBindo: 50, nilaiInggris: 48, rataRata: 47.67, keterangan: "Tidak Lulus" }
+            { id: 1, kodePendaftaran: "A2-101-9", nama: "Ahmad Fauzi", gedung: "A", bulan: "2", jenisKelamin: "Laki-laki", asalSekolah: "SMA 1 Pamulang", pekerjaanOrtu: "PNS", nilaiMat: 85, nilaiBindo: 78, nilaiInggris: 80, rataRata: 81, keterangan: "Lulus" },
+            { id: 2, kodePendaftaran: "B7-202-1", nama: "Siti Nurhaliza", gedung: "B", bulan: "7", jenisKelamin: "Perempuan", asalSekolah: "SMAN 2 Tangerang", pekerjaanOrtu: "Wiraswasta", nilaiMat: 65, nilaiBindo: 70, nilaiInggris: 68, rataRata: 67.67, keterangan: "Cadangan" },
+            { id: 3, kodePendaftaran: "V1-303-2", nama: "Budi Santoso", gedung: "V", bulan: "1", jenisKelamin: "Laki-laki", asalSekolah: "SMA Cendekia", pekerjaanOrtu: "Petani", nilaiMat: 45, nilaiBindo: 50, nilaiInggris: 48, rataRata: 47.67, keterangan: "Tidak Lulus" }
         ];
         syncStorage();
     }
@@ -49,37 +49,27 @@ function attachNilaiEvents() {
     });
 }
 
-// ========== KODE PENDAFTARAN ==========
-function validasiKode(kode) {
-    if (!kode || kode.length !== 2) return { valid: false, message: "Kode harus tepat 2 karakter!" };
-    const first = kode[0].toUpperCase();
-    const second = kode[1].toUpperCase();
-    if (!['A', 'B', 'V'].includes(first)) return { valid: false, message: "Karakter awal harus A, B, atau V!" };
-    const bulanValid = ['1','2','3','4','5','6','7','8','9','O','N','D'];
-    if (!bulanValid.includes(second)) return { valid: false, message: "Karakter kedua: 1-9 atau O(Oktober), N(November), D(Desember)" };
-    return { valid: true, message: "" };
-}
-
-function getGedungDanBulan(kode) {
-    if (!kode || kode.length !== 2) return { gedung: "?", bulan: "?" };
-    const first = kode[0].toUpperCase();
-    let gedung = first === 'A' ? 'Gedung A' : (first === 'B' ? 'Gedung B' : 'Viktor');
-    const second = kode[1].toUpperCase();
+// ========== KONVERSI GEDUNG & BULAN ==========
+function getGedungDanBulan(gedungCode, bulanCode) {
+    const gedungMap = { 'A': 'Gedung A', 'B': 'Gedung B', 'V': 'Gedung Viktor' };
+    const gedung = gedungMap[gedungCode] || '?';
     const bulanMap = {
         '1':'Januari','2':'Februari','3':'Maret','4':'April','5':'Mei','6':'Juni',
         '7':'Juli','8':'Agustus','9':'September','O':'Oktober','N':'November','D':'Desember'
     };
-    let bulan = bulanMap[second] || "Bulan?";
-    return { gedung, bulan };
+    const bulan = bulanMap[bulanCode] || 'Bulan?';
+    return `${gedung} (${bulan})`;
 }
 
 // ========== FORM RESET ==========
 function resetForm() {
-    document.getElementById('nim').value = '';
+    document.getElementById('kodePendaftaran').value = '';
     document.getElementById('nama').value = '';
-    document.getElementById('kode').value = '';
+    document.getElementById('gedung').value = '';
+    document.getElementById('bulan').value = '';
     document.getElementById('jk').value = '';
     document.getElementById('asalSekolah').value = '';
+    document.getElementById('pekerjaanOrtu').value = '';
     document.getElementById('mat').value = '0';
     document.getElementById('bindo').value = '0';
     document.getElementById('binggris').value = '0';
@@ -89,17 +79,19 @@ function resetForm() {
 
 // ========== SIMPAN / EDIT ==========
 function simpanData() {
-    const nim = document.getElementById('nim').value.trim();
+    const kodePendaftaran = document.getElementById('kodePendaftaran').value.trim();
     const nama = document.getElementById('nama').value.trim();
-    const kode = document.getElementById('kode').value.trim().toUpperCase();
+    const gedung = document.getElementById('gedung').value;
+    const bulan = document.getElementById('bulan').value;
     const jk = document.getElementById('jk').value;
     const asal = document.getElementById('asalSekolah').value.trim();
+    const pekerjaanOrtu = document.getElementById('pekerjaanOrtu').value.trim();
     let mat = parseFloat(document.getElementById('mat').value);
     let bindo = parseFloat(document.getElementById('bindo').value);
     let bing = parseFloat(document.getElementById('binggris').value);
 
-    if (!nim || !nama || !kode || !jk || !asal) {
-        Swal.fire("Error", "Semua field harus diisi (NIM, Nama, Kode, JK, Asal Sekolah)!", "error");
+    if (!kodePendaftaran || !nama || !gedung || !bulan || !jk || !asal || !pekerjaanOrtu) {
+        Swal.fire("Error", "Semua field harus diisi (Kode Pendaftaran, Nama, Gedung, Bulan, JK, Asal Sekolah, Pekerjaan Orang Tua)!", "error");
         return false;
     }
     if (isNaN(mat) || isNaN(bindo) || isNaN(bing)) {
@@ -110,9 +102,10 @@ function simpanData() {
     bindo = Math.min(100, Math.max(0, bindo));
     bing = Math.min(100, Math.max(0, bing));
 
-    const validKode = validasiKode(kode);
-    if (!validKode.valid) {
-        Swal.fire("Kode tidak valid", validKode.message, "warning");
+    // Cek unik kode pendaftaran (kecuali sedang edit data yang sama)
+    const existing = participants.find(p => p.kodePendaftaran === kodePendaftaran && (editId === null || p.id !== editId));
+    if (existing) {
+        Swal.fire("Error", "Kode Pendaftaran sudah digunakan! Masukkan kode yang berbeda.", "error");
         return false;
     }
 
@@ -128,7 +121,7 @@ function simpanData() {
         if (index !== -1) {
             participants[index] = {
                 ...participants[index],
-                nim, nama, kode, jenisKelamin: jk, asalSekolah: asal,
+                kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu,
                 nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing,
                 rataRata: rataRounded, keterangan: keteranganFix
             };
@@ -140,7 +133,7 @@ function simpanData() {
     } else {
         const newId = Date.now();
         const newPeserta = {
-            id: newId, nim, nama, kode, jenisKelamin: jk, asalSekolah: asal,
+            id: newId, kodePendaftaran, nama, gedung, bulan, jenisKelamin: jk, asalSekolah: asal, pekerjaanOrtu,
             nilaiMat: mat, nilaiBindo: bindo, nilaiInggris: bing,
             rataRata: rataRounded, keterangan: keteranganFix
         };
@@ -179,11 +172,13 @@ function editData(id) {
     const peserta = participants.find(p => p.id === id);
     if (!peserta) return;
     editId = id;
-    document.getElementById('nim').value = peserta.nim;
+    document.getElementById('kodePendaftaran').value = peserta.kodePendaftaran;
     document.getElementById('nama').value = peserta.nama;
-    document.getElementById('kode').value = peserta.kode;
+    document.getElementById('gedung').value = peserta.gedung;
+    document.getElementById('bulan').value = peserta.bulan;
     document.getElementById('jk').value = peserta.jenisKelamin;
     document.getElementById('asalSekolah').value = peserta.asalSekolah;
+    document.getElementById('pekerjaanOrtu').value = peserta.pekerjaanOrtu;
     document.getElementById('mat').value = peserta.nilaiMat;
     document.getElementById('bindo').value = peserta.nilaiBindo;
     document.getElementById('binggris').value = peserta.nilaiInggris;
@@ -198,7 +193,7 @@ function getFilteredData() {
     let filtered = [...participants];
     if (searchTerm) {
         filtered = filtered.filter(p =>
-            p.nim.toLowerCase().includes(searchTerm) ||
+            p.kodePendaftaran.toLowerCase().includes(searchTerm) ||
             p.nama.toLowerCase().includes(searchTerm) ||
             p.asalSekolah.toLowerCase().includes(searchTerm)
         );
@@ -218,16 +213,15 @@ function renderTable() {
         return;
     }
     filtered.forEach((p, idx) => {
-        const { gedung, bulan } = getGedungDanBulan(p.kode);
-        const lokasi = `${gedung} (${bulan})`;
+        const lokasi = getGedungDanBulan(p.gedung, p.bulan);
         const row = tbody.insertRow();
         row.insertCell(0).innerText = idx + 1;
-        row.insertCell(1).innerText = p.nim;
+        row.insertCell(1).innerText = p.kodePendaftaran;
         row.insertCell(2).innerText = p.nama;
-        row.insertCell(3).innerText = p.kode;
-        row.insertCell(4).innerText = lokasi;
-        row.insertCell(5).innerText = p.jenisKelamin;
-        row.insertCell(6).innerText = p.asalSekolah;
+        row.insertCell(3).innerText = lokasi;
+        row.insertCell(4).innerText = p.jenisKelamin;
+        row.insertCell(5).innerText = p.asalSekolah;
+        row.insertCell(6).innerText = p.pekerjaanOrtu;
         row.insertCell(7).innerText = p.nilaiMat;
         row.insertCell(8).innerText = p.nilaiBindo;
         row.insertCell(9).innerText = p.nilaiInggris;
